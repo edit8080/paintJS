@@ -9,7 +9,6 @@ body {
   align-items: center;
   padding: 40px 0px;
 }
-
 .canvas {
   width: 700px;
   height: 700px;
@@ -29,7 +28,6 @@ body {
 .controls__btns {
   margin-bottom: 30px;
 }
-
 .controls__btns button {
   all: unset;
   cursor: pointer;
