@@ -1,53 +1,91 @@
 const canvas = document.querySelector("#js-canvas");
-const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext("2d");
 const colors = document.querySelectorAll(".js-color");
 const range = document.querySelector("#js-range");
+const mode = document.querySelector("#js-mode");
 
-canvas.width = 700;
-canvas.height = 700;
+const INITIAL_COLOR = "#2c2c2c";
+const CANVAS_SIZE = 700;
 
-ctx.strokeStyle = "#2c2c2c";
+canvas.width = CANVAS_SIZE;
+canvas.height = CANVAS_SIZE;
+
+ctx.strokeStyle = INITIAL_COLOR;
+ctx.fillStyle = INITIAL_COLOR;
 ctx.lineWidth = 2.5;
 
 let painting = false;
+let filling = false;
+let currentColorNode = document.querySelector(".js-color");
 
-function stopPainting(){
-    painting = false;
+// 선 그리기
+function stopPainting() {
+  painting = false;
 }
-function startPainting(){
-    painting = true;
+function startPainting() {
+  painting = true;
 }
-function onMouseMove(event){
-    const x = event.offsetX;
-    const y = event.offsetY;
-    
-    if(!painting){
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
-    else{
-        ctx.lineTo(x, y);
-        ctx.stroke();
-    }
-}
-if(canvas){
-    canvas.addEventListener("mousemove",onMouseMove);
-    canvas.addEventListener("mousedown",startPainting);
-    canvas.addEventListener("mouseup",stopPainting);
-    canvas.addEventListener("mouseleave",stopPainting);
+function onMouseMove(event) {
+  const x = event.offsetX;
+  const y = event.offsetY;
+
+  if (!painting) {
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  } else {
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  }
 }
 
-function handleColorClick(event){
-    const color =  event.target.style.backgroundColor
-    ctx.strokeStyle = color;
+// 캔버스 채우기
+function handleCanvasClick(event) {
+  if (filling) ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-Array.from(colors).forEach(color=>color.addEventListener("click",handleColorClick));
-
-function handleRangeChange(event){
-    const lineWidth = event.target.value;
-    ctx.lineWidth = lineWidth;
+if (canvas) {
+  canvas.addEventListener("mousemove", onMouseMove);
+  canvas.addEventListener("mousedown", startPainting);
+  canvas.addEventListener("mouseup", stopPainting);
+  canvas.addEventListener("mouseleave", stopPainting);
+  canvas.addEventListener("click", handleCanvasClick);
 }
-if(range){
-    range.addEventListener("input",handleRangeChange);
+
+// 색 변경
+function handleColorClick(event) {
+  currentColorNode.innerText = "";
+
+  currentColorNode = event.target;
+  const color = currentColorNode.style.backgroundColor;
+
+  currentColorNode.innerText = "⋁";
+
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+}
+
+Array.from(colors).forEach((color) =>
+  color.addEventListener("click", handleColorClick)
+);
+
+// Range를 통한 선 두께 조절
+function handleRangeChange(event) {
+  const lineWidth = event.target.value;
+  ctx.lineWidth = lineWidth;
+}
+if (range) {
+  range.addEventListener("input", handleRangeChange);
+}
+// fill 모드 = 캔버스 채우기 , paint 모드 = 선 그리기 
+function handleModeClick(event) {
+  if (filling) {
+    filling = false;
+    mode.innerText = "Fill";
+  } else {
+    filling = true;
+    mode.innerText = "Paint";
+  }
+}
+if (mode) {
+  mode.addEventListener("click", handleModeClick);
 }
