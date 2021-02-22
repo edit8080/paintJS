@@ -2,13 +2,18 @@ const canvas = document.querySelector("#js-canvas");
 const ctx = canvas.getContext("2d");
 const colors = document.querySelectorAll(".js-color");
 const range = document.querySelector("#js-range");
-const mode = document.querySelector("#js-mode");
+const modeBtn = document.querySelector("#js-mode");
+const saveBtn = document.querySelector("#js-save");
 
 const INITIAL_COLOR = "#2c2c2c";
 const CANVAS_SIZE = 700;
 
 canvas.width = CANVAS_SIZE;
 canvas.height = CANVAS_SIZE;
+
+// 저장 시 background가 transparent한 문제 해결
+ctx.fillStyle = "white";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 ctx.strokeStyle = INITIAL_COLOR;
 ctx.fillStyle = INITIAL_COLOR;
@@ -37,10 +42,13 @@ function onMouseMove(event) {
     ctx.stroke();
   }
 }
-
 // 캔버스 채우기
 function handleCanvasClick(event) {
   if (filling) ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+// context menu 차단
+function handleContextMenu(event){
+    event.preventDefault();
 }
 
 if (canvas) {
@@ -49,6 +57,7 @@ if (canvas) {
   canvas.addEventListener("mouseup", stopPainting);
   canvas.addEventListener("mouseleave", stopPainting);
   canvas.addEventListener("click", handleCanvasClick);
+  canvas.addEventListener("contextmenu",handleContextMenu);
 }
 
 // 색 변경
@@ -73,19 +82,33 @@ function handleRangeChange(event) {
   const lineWidth = event.target.value;
   ctx.lineWidth = lineWidth;
 }
+
 if (range) {
   range.addEventListener("input", handleRangeChange);
 }
+
 // fill 모드 = 캔버스 채우기 , paint 모드 = 선 그리기 
 function handleModeClick(event) {
   if (filling) {
     filling = false;
-    mode.innerText = "Fill";
+    modeBtn.innerText = "Fill";
   } else {
     filling = true;
-    mode.innerText = "Paint";
+    modeBtn.innerText = "Paint";
   }
 }
-if (mode) {
-  mode.addEventListener("click", handleModeClick);
+if (modeBtn) {
+    modeBtn.addEventListener("click", handleModeClick);
+}
+
+function handleSaveClick(event){
+    const image = canvas.toDataURL("image/jpeg");
+    const link = document.createElement("a");
+    link.href = image;
+    link.download = "PaintJS[EXPORT]";
+    link.click();
+}
+
+if(saveBtn){
+    saveBtn.addEventListener("click",handleSaveClick);
 }
